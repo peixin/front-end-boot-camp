@@ -1,6 +1,7 @@
 const EOF = Symbol("EOF");
 
 let currentToken = null;
+let currentAttribute = null;
 
 function emit(token) {
   console.log(token);
@@ -51,7 +52,7 @@ function endTagOpen(c) {
 }
 
 function tagName(c) {
-  if (c.match(/^[\t\n\f $]/)) {
+  if (c.match(/^[\t\n\f ]$/)) {
     return beforeAttributeName;
   } else if (c === "/") {
     return selfClosingStartTag;
@@ -66,17 +67,105 @@ function tagName(c) {
   }
 }
 
+// <html lang="en"></html>
 function beforeAttributeName(c) {
-  if (c.match(/^[\t\n\f $]/)) {
+  if (c.match(/^[\t\n\f ]$/)) {
     return beforeAttributeName;
   } else if (c === ">") {
-    return data;
-  } else if (c === "=") {
-    return beforeAttributeName;
+    return tagName(c);
   } else if (c === "/") {
     return selfClosingStartTag;
   } else {
-    return beforeAttributeName;
+    currentAttribute = {
+      name: "",
+      value: "",
+    };
+    return attributeName(c);
+  }
+}
+
+function attributeName(c) {
+  if (c.match(/^[a-zA-Z0-9\-]$/)) {
+    currentAttribute.name += c;
+    return attributeName;
+  } else {
+    return afterAttributeName(c);
+  }
+}
+
+function afterAttributeName(c) {
+  if (c.match(/^[\t\n\f ]$/)) {
+    return afterAttributeName;
+  } else if (c === ">") {
+    currentToken[currentAttribute.name] = "";
+    return tagName(c);
+  } else if (c === "/") {
+    currentToken[currentAttribute.name] = "";
+    return selfClosingStartTag;
+  } else if (c === "=") {
+    return beforeAttributeValue;
+  } else {
+    return afterAttributeName;
+  }
+}
+
+function beforeAttributeValue(c) {
+  if (c === "'") {
+    return singleQuotedAttributeValue;
+  } else if (c === '"') {
+    return doubleQuotedAttributeValue;
+  } else if (c === "/") {
+    return selfClosingStartTag;
+  } else if (c === ">") {
+    return tagName(c);
+  } else {
+    return unquotedAttributeValue(c);
+  }
+}
+
+function afterQuotedAttributeValue(c) {
+  if (c === "/") {
+    return selfClosingStartTag;
+  } else if (c === ">") {
+    return tagName(c);
+  }  else {
+    return beforeAttributeName(c);
+  }
+}
+
+function singleQuotedAttributeValue(c) {
+  if (c === "'") {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return afterQuotedAttributeValue;
+  } else {
+    currentAttribute.value += c;
+    return singleQuotedAttributeValue;
+  }
+}
+
+function doubleQuotedAttributeValue(c) {
+  if (c === '"') {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return afterQuotedAttributeValue;
+  } else {
+    currentAttribute.value += c;
+    return doubleQuotedAttributeValue;
+  }
+}
+
+function unquotedAttributeValue(c) {
+  if (c === "/") {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return selfClosingStartTag;
+  } else if (c === ">") {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return tagName(c);
+  } else if (c.match(/^[\t\n\f ]$/)) {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return beforeAttributeName(c);
+  } else {
+    currentAttribute.value += c;
+    return unquotedAttributeValue;
   }
 }
 
