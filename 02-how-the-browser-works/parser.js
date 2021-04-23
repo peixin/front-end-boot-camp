@@ -8,15 +8,47 @@ let currentTextNode = null;
 const rules = [];
 const stack = [];
 
-
 function addCSSRules(text) {
   let ast = css.parse(text);
   rules.push(...ast.stylesheet.rules);
 }
 
+function match(element, selector) {
+  return false;
+}
+
 function computeCSS(element) {
-  console.log(rules);
-  console.log("Compute CSS for Element:", element);
+  const elements = stack.slice().reverse();
+  if (!element.computedStyle) {
+    element.computedStyle = {};
+  }
+
+  for (let rule of rules) {
+    let selectorParts = rule.selectors[0]
+      .split(" ")
+      .filter((c) => c.trim())
+      .reverse();
+
+    if (!match(element, selectorParts[0])) {
+      continue;
+    }
+
+    let matched = false;
+    let selectorIndex = 1;
+    for (let elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+      if (matched(elements[elementIndex], selectorParts[selectorIndex])) {
+        selectorIndex++;
+      }
+    }
+
+    if (selectorIndex >= selectorParts.length) {
+      matched = true;
+    }
+
+    if (matched) {
+      console.log(`Element ${element} match rule ${rule}`);
+    }
+  }
 }
 
 function emit(token) {
@@ -36,7 +68,7 @@ function emit(token) {
       }
     }
     computeCSS(element);
-    
+
     if (top) {
       element.parent = top;
       top.children.push(element);
@@ -52,7 +84,7 @@ function emit(token) {
       stack.pop();
     }
     currentTextNode = null;
-    if(token.tagName === "style") {
+    if (token.tagName === "style") {
       addCSSRules(top.children[0].content);
     }
   } else if (token.type === "text") {
