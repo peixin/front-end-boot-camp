@@ -2,12 +2,10 @@ const EOF = Symbol("EOF");
 
 let currentToken = null;
 let currentAttribute = null;
+let currentTextNode = null;
 const stack = [];
 
 function emit(token) {
-  if (token.type === "text") {
-    return;
-  }
   let top = stack[stack.length - 1];
 
   if (token.type === "startTag") {
@@ -23,20 +21,30 @@ function emit(token) {
         element.attributes.push({ name: p, value: token[p] });
       }
     }
-    if(top) {
+    if (top) {
       element.parent = top;
       top.children.push(element);
     }
-    if(!token.isSelfClosing) {
+    if (!token.isSelfClosing) {
       stack.push(element);
     }
-
+    currentTextNode = null;
   } else if (token.type === "endTag") {
-    if(top.tagName !== token.tagName) {
+    if (top.tagName !== token.tagName) {
       throw new Error("element not match");
     } else {
       stack.pop();
     }
+    currentTextNode = null;
+  } else if (token.type === "text") {
+    if (!currentTextNode) {
+      currentTextNode = {
+        type: "text",
+        content: "",
+      };
+      top.children.push(currentTextNode);
+    }
+    currentTextNode.content += token.content;
   }
 }
 
