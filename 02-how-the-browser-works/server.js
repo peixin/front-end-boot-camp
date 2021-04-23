@@ -21,6 +21,10 @@ http
       background-color: #ff5000;
     }
 
+    div .abc {
+      font-size: 16px;
+    }
+
     body div img {
       width: 30px;
       background-color: #ff1111;
@@ -30,7 +34,7 @@ http
 <body>
   <div>
     <img id="myid"/>
-    <img aaa />
+    <img aaa class="abc def" />
   </div>
 </body>
 </html>`

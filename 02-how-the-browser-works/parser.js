@@ -19,12 +19,12 @@ function match(element, selector) {
   }
 
   if (selector.charAt(0) === "#") {
-    let attr = element.attributes.filter((attr) => attr.name === "id");
+    let attr = element.attributes.filter((attr) => attr.name === "id")[0];
     if (attr && attr.value === selector.slice(1)) {
       return true;
     }
   } else if (selector.charAt(0) === ".") {
-    let attr = element.attributes.filter((attr) => attr.name === "id");
+    let attr = element.attributes.filter((attr) => attr.name === "class")[0];
     if (
       attr &&
       attr.value
@@ -74,7 +74,16 @@ function computeCSS(element) {
     }
 
     if (matched) {
-      console.log(`Element ${element} match rule ${rule}`);
+      const computedStyle = element.computedStyle;
+      for(let declaration of rule.declarations) {
+        if(!computedStyle[declaration.property]) {
+          computedStyle[declaration.property] = {};
+          computedStyle[declaration.property].value = declaration.value;
+        }
+      }
+      console.log(computedStyle);
+      // for(rule.)
+      // if(computedStyle)
     }
   }
 }
@@ -215,6 +224,7 @@ function attributeName(c) {
 
 function afterAttributeName(c) {
   if (c.match(/^[\t\n\f ]$/)) {
+    currentToken[currentAttribute.name] = "";
     return afterAttributeName;
   } else if (c === ">") {
     currentToken[currentAttribute.name] = "";
@@ -225,7 +235,7 @@ function afterAttributeName(c) {
   } else if (c === "=") {
     return beforeAttributeValue;
   } else {
-    return afterAttributeName;
+    return beforeAttributeName(c);
   }
 }
 
