@@ -1,9 +1,19 @@
+const css = require("css");
+
 const EOF = Symbol("EOF");
 
 let currentToken = null;
 let currentAttribute = null;
 let currentTextNode = null;
+const rules = [];
 const stack = [];
+
+
+function addCSSRules(text) {
+  let ast = css.parse(text);
+  console.log(JSON.stringify(ast, null, "  "));
+  rules.push(...ast.stylesheet.rules);
+}
 
 function emit(token) {
   let top = stack[stack.length - 1];
@@ -36,6 +46,9 @@ function emit(token) {
       stack.pop();
     }
     currentTextNode = null;
+    if(token.tagName === "style") {
+      addCSSRules(top.children[0].content);
+    }
   } else if (token.type === "text") {
     if (!currentTextNode) {
       currentTextNode = {
@@ -228,5 +241,4 @@ module.exports.parserHTML = function parserHTML(html) {
     state = state(c);
   }
   state = state(EOF);
-  console.log(stack);
 };
