@@ -13,6 +13,35 @@ function addCSSRules(text) {
   rules.push(...ast.stylesheet.rules);
 }
 
+function specificity(selector) {
+  const p = [0, 0, 0, 0];
+  const selectorParts = selector
+    .split(" ")
+    .map((c) => c.trim())
+    .filter((c) => c);
+
+  for (selector of selectorParts) {
+    if (selector[0] === "#") {
+      p[1] += 1;
+    } else if (selector[0] === ".") {
+      p[2] += 1;
+    } else {
+      p[3] += 1;
+    }
+  }
+  return p;
+}
+
+function compare(sp1, sp2) {
+  let i = 0;
+  for (let i = 0; i < 4; i++) {
+    if (sp1[i] - sp2[i]) {
+      return sp1[i] - sp2[i];
+    }
+  }
+  return 0;
+}
+
 function match(element, selector) {
   if (!selector || !element.attributes) {
     return false;
@@ -53,8 +82,8 @@ function computeCSS(element) {
   for (let rule of rules) {
     let selectorParts = rule.selectors[0]
       .split(" ")
-      .map(s => s.trim())
-      .filter(s => s)
+      .map((s) => s.trim())
+      .filter((s) => s)
       .reverse();
 
     if (!match(element, selectorParts[0])) {
@@ -75,15 +104,20 @@ function computeCSS(element) {
 
     if (matched) {
       const computedStyle = element.computedStyle;
-      for(let declaration of rule.declarations) {
-        if(!computedStyle[declaration.property]) {
+      var sp = specificity(rule.selectors[0]);
+      for (let declaration of rule.declarations) {
+        if (!computedStyle[declaration.property]) {
           computedStyle[declaration.property] = {};
+        }
+
+        if (!computedStyle[declaration.property].specificity) {
           computedStyle[declaration.property].value = declaration.value;
+          computedStyle[declaration.property].specificity = sp;
+        } else if (compare(sp, computedStyle[declaration.property].specificity) > 0) {
+          computedStyle[declaration.property].value = declaration.value;
+          computedStyle[declaration.property].specificity = sp;
         }
       }
-      console.log(computedStyle);
-      // for(rule.)
-      // if(computedStyle)
     }
   }
 }
@@ -107,7 +141,7 @@ function emit(token) {
     computeCSS(element);
 
     if (top) {
-      element.parent = top;
+      // element.parent = top;
       top.children.push(element);
     }
     if (!token.isSelfClosing) {
@@ -317,4 +351,5 @@ module.exports.parserHTML = function parserHTML(html) {
     state = state(c);
   }
   state = state(EOF);
+  return stack[0];
 };
