@@ -14,6 +14,33 @@ function addCSSRules(text) {
 }
 
 function match(element, selector) {
+  if (!selector || !element.attributes) {
+    return false;
+  }
+
+  if (selector.charAt(0) === "#") {
+    let attr = element.attributes.filter((attr) => attr.name === "id");
+    if (attr && attr.value === selector.slice(1)) {
+      return true;
+    }
+  } else if (selector.charAt(0) === ".") {
+    let attr = element.attributes.filter((attr) => attr.name === "id");
+    if (
+      attr &&
+      attr.value
+        .split(" ")
+        .map((c) => c.trim())
+        .filter((c) => c)
+        .includes(selector.slice(1))
+    ) {
+      return true;
+    }
+  } else {
+    if (element.tagName === selector) {
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -26,7 +53,8 @@ function computeCSS(element) {
   for (let rule of rules) {
     let selectorParts = rule.selectors[0]
       .split(" ")
-      .filter((c) => c.trim())
+      .map(s => s.trim())
+      .filter(s => s)
       .reverse();
 
     if (!match(element, selectorParts[0])) {
@@ -36,7 +64,7 @@ function computeCSS(element) {
     let matched = false;
     let selectorIndex = 1;
     for (let elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-      if (matched(elements[elementIndex], selectorParts[selectorIndex])) {
+      if (match(elements[elementIndex], selectorParts[selectorIndex])) {
         selectorIndex++;
       }
     }
