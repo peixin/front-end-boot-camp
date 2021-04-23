@@ -11,8 +11,12 @@ const stack = [];
 
 function addCSSRules(text) {
   let ast = css.parse(text);
-  console.log(JSON.stringify(ast, null, "  "));
   rules.push(...ast.stylesheet.rules);
+}
+
+function computeCSS(element) {
+  console.log(rules);
+  console.log("Compute CSS for Element:", element);
 }
 
 function emit(token) {
@@ -31,6 +35,8 @@ function emit(token) {
         element.attributes.push({ name: p, value: token[p] });
       }
     }
+    computeCSS(element);
+    
     if (top) {
       element.parent = top;
       top.children.push(element);
