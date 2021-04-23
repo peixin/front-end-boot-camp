@@ -23,17 +23,31 @@ function emit(token) {
         element.attributes.push({ name: p, value: token[p] });
       }
     }
-    if(top) {
+    if (top) {
       element.parent = top;
       top.children.push(element);
     }
-    if(!token.isSelfClosing) {
+    if (!token.isSelfClosing) {
       stack.push(element);
     }
-
   } else if (token.type === "endTag") {
-    if(top.tagName !== token.tagName) {
-      throw new Error("element not match");
+    if (top.tagName !== token.tagName) {
+      let currentTop = top;
+      let fixed = false;
+      while (currentTop) {
+        if (currentTop.tagName !== token.tagName) {
+          currentTop.attributes.push({ name: "isSelfClosing", value: true });
+          stack.pop();
+          currentTop = currentTop.parent;
+        } else {
+          stack.pop();
+          fixed = true;
+          break;
+        }
+      }
+      if (!fixed) {
+        throw new Error("element not match");
+      }
     } else {
       stack.pop();
     }
