@@ -95,12 +95,16 @@ function computeCSS(element) {
     for (let elementIndex = 0; elementIndex < elements.length; elementIndex++) {
       if (match(elements[elementIndex], selectorParts[selectorIndex])) {
         selectorIndex++;
+        if (selectorIndex >= selectorParts.length) {
+          matched = true;
+          break;
+        }
       }
     }
 
-    if (selectorIndex >= selectorParts.length) {
-      matched = true;
-    }
+    // if (selectorIndex >= selectorParts.length) {
+    //   matched = true;
+    // }
 
     if (matched) {
       const computedStyle = element.computedStyle;
@@ -113,7 +117,9 @@ function computeCSS(element) {
         if (!computedStyle[declaration.property].specificity) {
           computedStyle[declaration.property].value = declaration.value;
           computedStyle[declaration.property].specificity = sp;
-        } else if (compare(sp, computedStyle[declaration.property].specificity) > 0) {
+        } else if (
+          compare(sp, computedStyle[declaration.property].specificity) > 0
+        ) {
           computedStyle[declaration.property].value = declaration.value;
           computedStyle[declaration.property].specificity = sp;
         }
