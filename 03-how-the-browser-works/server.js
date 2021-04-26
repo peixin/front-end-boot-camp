@@ -21,7 +21,7 @@ http
       background-color: #ff5000;
     }
 
-    body {
+    body div {
       display: flex;
     }
 

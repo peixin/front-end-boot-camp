@@ -42,6 +42,10 @@ DOM with CSS ➡️ (layout) ➡️ DOM with position
 
 ---
 
-### start layout, prepare flex property 
+### Start layout, prepare flex property 
 - layout when emit end tag
 - style set default property
+
+### Collect elements into "Line"
+- compute mainSpace, crossSpace element by element
+- mainSpace can not contain element, then new line
