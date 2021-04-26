@@ -21,6 +21,10 @@ http
       background-color: #ff5000;
     }
 
+    body {
+      display: flex;
+    }
+
     div .abc {
       font-size: 16px;
     }

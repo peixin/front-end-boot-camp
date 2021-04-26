@@ -96,15 +96,14 @@ function computeCSS(element) {
       if (match(elements[elementIndex], selectorParts[selectorIndex])) {
         selectorIndex++;
         if (selectorIndex >= selectorParts.length) {
-          matched = true;
           break;
         }
       }
     }
 
-    // if (selectorIndex >= selectorParts.length) {
-    //   matched = true;
-    // }
+    if (selectorIndex >= selectorParts.length) {
+      matched = true;
+    }
 
     if (matched) {
       const computedStyle = element.computedStyle;

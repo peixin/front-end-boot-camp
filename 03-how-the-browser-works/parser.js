@@ -1,4 +1,5 @@
 const css = require("css");
+const layout = require("./layout.js");
 
 const EOF = Symbol("EOF");
 
@@ -95,6 +96,9 @@ function computeCSS(element) {
     for (let elementIndex = 0; elementIndex < elements.length; elementIndex++) {
       if (match(elements[elementIndex], selectorParts[selectorIndex])) {
         selectorIndex++;
+        if (selectorIndex >= selectorParts.length) {
+          break;
+        }
       }
     }
 
@@ -113,7 +117,9 @@ function computeCSS(element) {
         if (!computedStyle[declaration.property].specificity) {
           computedStyle[declaration.property].value = declaration.value;
           computedStyle[declaration.property].specificity = sp;
-        } else if (compare(sp, computedStyle[declaration.property].specificity) > 0) {
+        } else if (
+          compare(sp, computedStyle[declaration.property].specificity) > 0
+        ) {
           computedStyle[declaration.property].value = declaration.value;
           computedStyle[declaration.property].specificity = sp;
         }
@@ -152,12 +158,13 @@ function emit(token) {
     if (top.tagName !== token.tagName) {
       throw new Error("element not match");
     } else {
+      if (token.tagName === "style") {
+        addCSSRules(top.children[0].content);
+      }
+      layout(top);
       stack.pop();
     }
     currentTextNode = null;
-    if (token.tagName === "style") {
-      addCSSRules(top.children[0].content);
-    }
   } else if (token.type === "text") {
     if (!currentTextNode) {
       currentTextNode = {
