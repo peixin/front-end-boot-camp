@@ -3,6 +3,9 @@
 ## Target
 HTML ➡️ (parse) ➡️ DOM ➡️ (css computing) ➡️ DOM with CSS
 
+[Last week](https://github.com/peixin/geektime-front-end-boot-camp/tree/master/01-how-the-browser-works) to see the past steps
+
+---
 ### HTML ➡️ (parse) ➡️ DOM
 - use finite state machine parse html tag
 - use finite state machine process attribute
