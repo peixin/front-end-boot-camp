@@ -14,7 +14,7 @@ module.exports = class ChunkedBodyParser {
   }
 
   waitingLength(char) {
-    if (char === "0") {
+    if (this.length === 0 && char === "0") {
       return this.finished;
     } else if (char === "\r") {
       return this.WaitingLengthLineEnd;

@@ -54,7 +54,7 @@ function layout(element) {
   setDefaultValue(style, "flexDirection", "row");
   setDefaultValue(style, "alignItems", "stretch");
   setDefaultValue(style, "justifyContent", "flex-start");
-  setDefaultValue(style, "flexWrap", "noWrap");
+  setDefaultValue(style, "flexWrap", "nowrap");
   setDefaultValue(style, "alignContent", "stretch");
 
   let mainSize,
@@ -149,8 +149,8 @@ function layout(element) {
     // flex: 1
     if (itemStyle.flex) {
       flexLine.push(item);
-    } else if (style.flexWrap === "noWrap" && isAutoMainSize) {
-      // noWrap
+    } else if (style.flexWrap === "nowrap" && isAutoMainSize) {
+      // nowrap
       mainSpace -= itemStyle[mainSize];
       // calculate  crossSpace
       if (itemStyle[crossSize] !== null && itemStyle[crossSize] !== void 0) {
@@ -194,7 +194,9 @@ function layout(element) {
   // calculate crossSpace
   if (style.flexWrap === "nowrap" || isAutoMainSize) {
     flexLine.crossSpace =
-      style[crossSize] !== undefined ? style[crossSize] : crossSpace;
+      style[crossSize] !== undefined && style[crossSize] !== null
+        ? style[crossSize]
+        : crossSpace;
   } else {
     flexLine.crossSpace = crossBase;
   }
@@ -293,7 +295,7 @@ function layout(element) {
     crossSpace = 0;
     style[crossSize] = 0;
     for (let i = 0; i < flexLines.length; i += 1) {
-      style[crossSize] += +flexLines[i].crossSpace;
+      style[crossSize] += flexLines[i].crossSpace;
     }
   } else {
     crossSpace = style[crossSize];
