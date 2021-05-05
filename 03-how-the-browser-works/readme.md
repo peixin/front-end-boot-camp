@@ -54,7 +54,12 @@ DOM with CSS ➡️ (layout) ➡️ DOM with position
 - ...
 
 ### calculate cross axis
-- ...
+- when `itemStyle.flex` has value, calculate width (mainSize) by `mainSpace`
+- else by `containerStyle.justifyContent`
+- calculate width, left, right (height, top, bottom for flexDirection is column)
+- single line
+- multiline
+
 
 ### draw single element
 - ...
