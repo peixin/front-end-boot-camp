@@ -1,7 +1,11 @@
 const net = require("net");
+const path = require("path");
+const images = require("images");
 const ResponseParser = require("./response-parser");
 const parser = require("./parser");
+const render = require("./render");
 
+const rootDir = path.resolve(__filename, "..");
 
 class Request {
   constructor(options) {
@@ -86,5 +90,7 @@ void (async function () {
   });
   let response = await request.send();
   const dom = parser.parserHTML(response.body);
-  // console.log(JSON.stringify(dom, null, "  "));
+  const viewport = images(800, 600);
+  render(viewport, dom.children[1].children[3].children[1].children[3]);
+  viewport.save(path.join(rootDir, "viewport.jpg"));
 })();

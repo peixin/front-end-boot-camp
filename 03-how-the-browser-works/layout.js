@@ -246,7 +246,8 @@ function layout(element) {
             itemStyle[mainSize] = (mainSpace / flexTotal) * itemStyle.flex;
           }
           itemStyle[mainStart] = currentMain;
-          itemStyle[mainEnd] = itemStyle[mainStart] + mainSign * item[mainSize];
+          itemStyle[mainEnd] =
+            itemStyle[mainStart] + mainSign * itemStyle[mainSize];
           currentMain = itemStyle[mainEnd];
         }
       } else {
@@ -292,7 +293,7 @@ function layout(element) {
     crossSpace = 0;
     style[crossSize] = 0;
     for (let i = 0; i < flexLines.length; i += 1) {
-      style[crossSize] += + flexLines[i].crossSpace;
+      style[crossSize] += +flexLines[i].crossSpace;
     }
   } else {
     crossSpace = style[crossSize];
@@ -307,7 +308,7 @@ function layout(element) {
     crossBase = 0;
   }
 
-  // let lienSize = style[crossSize] / flexLines.length;
+  let lienSize = style[crossSize] / flexLines.length;
   let step = 0;
 
   if (style.alignContent === "flex-start") {
@@ -377,7 +378,7 @@ function layout(element) {
       }
     }
   });
-  console.log(items);
+  // console.log(items);
 }
 
 module.exports = layout;

@@ -1,7 +1,7 @@
 # Week 3
 
 ## Target
-DOM with CSS ➡️ (layout) ➡️ DOM with position
+DOM with CSS ➡️ (layout) ➡️ DOM with position ➡️ (render) ➡️ Bitmap
 
 [Last week](https://github.com/peixin/geektime-front-end-boot-camp/tree/master/02-how-the-browser-works) to see the past steps
 
@@ -64,7 +64,8 @@ DOM with CSS ➡️ (layout) ➡️ DOM with position
 - calculate item `height`, `top`, `bottom` from `alignContent` and (`alignSelf` or `alignItems`)
 
 ### draw single element
-- ...
+- use npm library `images`
+- DIY every style property e.g. `background-color`
 
 ### draw DOM tree
-- ...
+- recurrence call render for dom
