@@ -47,5 +47,17 @@ DOM with CSS ➡️ (layout) ➡️ DOM with position
 - style set default property
 
 ### Collect elements into "Line"
-- compute mainSpace, crossSpace element by element
+- calculate mainSpace, crossSpace element by element
 - mainSpace can not contain element, then new line
+
+### calculate main axis
+- ...
+
+### calculate cross axis
+- ...
+
+### draw single element
+- ...
+
+### draw DOM tree
+- ...

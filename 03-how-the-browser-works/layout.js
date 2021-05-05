@@ -127,7 +127,7 @@ function layout(element) {
     }
   }
 
-  const flexLine = [];
+  let flexLine = [];
   const flexLines = [flexLine];
 
   let mainSpace = style[mainSize];
@@ -180,7 +180,7 @@ function layout(element) {
   }
 
   flexLine.mainSpace = mainSpace;
-  console.log(items);
+  console.log(JSON.stringify(items, null, 2));
 }
 
 module.exports = layout;
