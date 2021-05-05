@@ -51,15 +51,17 @@ DOM with CSS ➡️ (layout) ➡️ DOM with position
 - mainSpace can not contain element, then new line
 
 ### calculate main axis
-- ...
+> e.g. flexDirection is row
+- if `itemStyle.flex` has value, calculate `width` (mainSize) from `mainSpace`
+- else calculate based on `containerStyle.justifyContent`
+- calculate `width`, `left`, `right`
+  * single line
+  * multiline
 
 ### calculate cross axis
-- when `itemStyle.flex` has value, calculate width (mainSize) by `mainSpace`
-- else by `containerStyle.justifyContent`
-- calculate width, left, right (height, top, bottom for flexDirection is column)
-- single line
-- multiline
-
+> e.g. flexDirection is row
+- calculate container `height`
+- calculate item `height`, `top`, `bottom` from `alignContent` and (`alignSelf` or `alignItems`)
 
 ### draw single element
 - ...
