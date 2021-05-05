@@ -68,4 +68,4 @@ DOM with CSS ➡️ (layout) ➡️ DOM with position ➡️ (render) ➡️ Bit
 - DIY every style property e.g. `background-color`
 
 ### draw DOM tree
-- recurrence call render for dom
+- recurrence call render for dom's children
