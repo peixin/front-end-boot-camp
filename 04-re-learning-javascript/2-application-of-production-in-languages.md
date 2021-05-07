@@ -27,10 +27,10 @@
 > `? ::= ?`
 
 
-## Lex & Syntax
-### Lex:Regular Grammar (III)
+## Lexical & Syntax
+### lexical:Regular Grammar (III)
 - White Space
-- Line Feed
+- Line Terminator
 - Comment
 - Token
 
@@ -40,7 +40,7 @@
 
 #### Grammar
 + 文法 grammar
-  - 词法 lex ➡️ Regular Grammar (III) ➡️ [lexer](https://en.wikipedia.org/wiki/Lexical_analysis)(lexical analysis) ➡️ token
+  - 词法 lexical ➡️ Regular Grammar (III) ➡️ [lexer](https://en.wikipedia.org/wiki/Lexical_analysis)(lexical analysis) ➡️ token
   - 语法 syntax ➡️ Context-free (II) ➡️ [parsing](https://en.wikipedia.org/wiki/Parsing)(syntax analysis) ➡️ syntax tree
 
 
