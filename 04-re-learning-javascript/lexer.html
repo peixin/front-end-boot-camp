@@ -1,0 +1,59 @@
+<pre>
+<script>
+  const xregexp = {
+    InputElement: /<WhiteSpace>|<LineTerminator>|<Comments>|<Token>/,
+    WhiteSpace: / /,
+    LineTerminator: /\n|\r/,
+    Comments: /<SingleLineComment>|<MultiLineComment>/,
+    SingleLineComment: /\/\/.*<LineTerminator>/,
+    MultiLineComment: /\/\*([^*]|\*[^\/])*\*\//,
+    Token: /<Literal>|<Keywords>|<Identifier>|<Punctuator>/,
+    Literal: /<NumberLiteral>|<BooleanLiteral>|<StringLiteral>|<NullLiteral>/,
+    Keywords: /if|else|for|function|var|let|const/,
+    Identifier: /[$_a-zA-Z][0-9a-zA-Z$_]*/,
+    Punctuator: /\+|\-|\*|\/|\+\+|\-\-|\.|,|;|\:|=|==|===|!|!=|!==|@|&&|&|\|\||\||\)|\(|\}|\{|\]|\[|=>|\?|\>|\</,
+    NumberLiteral: /([1-9][0-9]*|0)(\.[0-9]*)?|\.[0-9]+/,
+    BooleanLiteral: /true|false/,
+    StringLiteral: /'([^'\n]|\\[\s\S])*'|"([^'\n]|\\[\s\S])*"/,
+    NullLiteral: /null/,
+  }
+
+  function compileRegExp(xregexp, name) {
+    let regExp = xregexp[name].source.replace(/\<([^>]+)\>/g, (str, $1) => {
+      return compileRegExp(xregexp, $1);
+    });
+    return regExp;
+  }
+
+  function scan(str) {
+    const regExp = new RegExp(compileRegExp(xregexp, "InputElement"), "g");
+    console.log(regExp);
+    while (regExp.lastIndex < str.length) {
+      const r = regExp.exec(str)
+      if (!r[0].length) {
+        break;
+      }
+      document.write(r[0]);
+    }
+  }
+
+  scan(`
+  // test 1
+  // test 2
+  /*
+  * test 3
+  */
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      let cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.innerText =
+        pattern[i * 3 + j] === 2 ? "❌" : pattern[i * 3 + j] === 1 ? "⭕️" : "";
+      cell.addEventListener("click", () => useMove(i, j));
+      board.appendChild(cell);
+    }
+    board.appendChild(document.createElement("br"));
+  }
+   `);
+</script>
+</pre>
