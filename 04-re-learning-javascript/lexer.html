@@ -1,81 +1,160 @@
-<pre>
-<script>
-  class XRegExp {
-    constructor(source, flag, root = "root") {
-      this.table = new Map();
-      this.regexp = new RegExp(this.compileRegExp(source, root, 0).source, flag);
+<style>
+  #codeArea {
+    background-color: rgb(30, 30, 30);
+    color: rgb(212, 212, 212);
+    white-space: pre;
+  }
+
+  .keywords {
+    color: rgb(197, 134, 192);
+  }
+
+  .stringLiteral {
+    color: rgb(206, 145, 120);
+  }
+
+  .comments {
+    color: rgb(152, 195, 121);
+  }
+
+  .bracketsPunctuator {
+    color: rgb(255, 215, 0);
+  }
+
+  .identifier {
+    color: rgb(156, 220, 254);
+  }
+
+  .numberLiteral {
+    color: rgb(181, 206, 168);
+  }
+</style>
+
+<body>
+  <div id="codeArea"></div>
+  <script>
+    const codeArea = document.querySelector("#codeArea");
+    const typeMap = {
+      LineTerminator: { tagName: "br" },
+      Keywords: { tagName: "span", class: "keywords" },
+      BooleanLiteral: { tagName: "span", class: "keywords" },
+      Identifier: { tagName: "span", class: "identifier" },
+      NullLiteral: { tagName: "span", class: "keywords" },
+      NumberLiteral: { tagName: "span", class: "numberLiteral" },
+      Comments: { tagName: "span", class: "comments" },
+      StringLiteral: { tagName: "span", class: "stringLiteral" },
+      BracketsPunctuator: { tagName: "span", class: "bracketsPunctuator" },
     }
 
-    compileRegExp(source, name, start) {
-      let length = 0;
-      const regExp = source[name].source.replace(/\<([^>]+)\>/g, (str, $1) => {
-        this.table.set(start + length, $1);
-        // this.table.set($1, start + length);
+    class XRegExp {
+      constructor(source, flag, root = "root") {
+        this.table = new Map();
+        this.regexp = new RegExp(this.compileRegExp(source, root, 0).source, flag);
+      }
 
-        ++length;
+      compileRegExp(source, name, start) {
+        let length = 0;
+        const regExp = source[name].source.replace(/\<([^>]+)\>/g, (str, $1) => {
+          this.table.set(start + length, $1);
+          // this.table.set($1, start + length);
 
-        let r = this.compileRegExp(source, $1, start + length);
-        length += r.length;
-        return `(${r.source})`;
-      });
-      return { source: regExp, length };
+          ++length;
+
+          let r = this.compileRegExp(source, $1, start + length);
+          length += r.length;
+          return `(${r.source})`;
+        });
+        return { source: regExp, length };
+      }
+
+      exec(string) {
+        const r = this.regexp.exec(string);
+        for (let i = 1; i < r.length; i++) {
+          if (r[i] !== void 0) {
+            r[this.table.get(i - 1)] = r[i];
+          }
+        }
+
+        return r;
+      }
+
+      get lastIndex() {
+        return this.regexp.lastIndex;
+      }
+
+      set lastIndex(value) {
+        this.regexp.lastIndex = lastIndex;
+      }
+
+      get source() {
+        return this.regexp.source;
+      }
     }
 
-    exec(string) {
-      const r = this.regexp.exec(string);
-      for (let i = 1; i < r.length; i++) {
-        if (r[i] !== void 0) {
-          r[this.table.get(i - 1)] = r[i];
+
+    function scan(str) {
+      const regExp = new XRegExp({
+        InputElement: /<WhiteSpace>|<LineTerminator>|<Comments>|<Token>/,
+        WhiteSpace: / /,
+        LineTerminator: /\n|\r/,
+        Comments: /<SingleLineComment>|<MultiLineComment>/,
+        SingleLineComment: /\/\/.*<LineTerminator>/,
+        MultiLineComment: /\/\*(?:[^*]|\*[^\/])*\*\//,
+        Token: /<Literal>|<Keywords>|<Identifier>|<Punctuator>/,
+        Literal: /<NumberLiteral>|<BooleanLiteral>|<StringLiteral>|<NullLiteral>/,
+        Keywords: /if|else|for|function|var|let|const|get|set/,
+        Identifier: /[$_a-zA-Z][0-9a-zA-Z$_]*/,
+        Punctuator: /<BracketsPunctuator>|\+|\-|\*|\/|\+\+|\-\-|\+=|\-=|\.|,|;|\:|=|==|===|!|!=|!==|@|&&|&|\|\||\||\]|\[|=>|\?|\>|\</,
+        BracketsPunctuator: /\)|\(|\}|\{/,
+        NumberLiteral: /(?:[1-9][0-9]*|0)(?:\.[0-9]*)?|\.[0-9]+/,
+        BooleanLiteral: /true|false/,
+        StringLiteral: /'(?:[^'\n]|\\[\s\S])*'|"(?:[^'\n]|\\[\s\S])*"|`(?:[^'\n]|\\[\s\S])*`/,
+        NullLiteral: /null/,
+      }, "g", "InputElement");
+      // console.log(regExp.source);
+      while (regExp.lastIndex < str.length) {
+        const r = regExp.exec(str)
+        // console.log(r);
+        if (!r === null) {
+          break;
+        }
+        render(r);
+        // document.write(r[0]);
+      }
+    }
+
+    function getTag(execResult) {
+      let tag;
+      for (type in execResult) {
+        if (!/[A-Z][a-z-A-Z]+/.test(type)) {
+          continue;
+        }
+        let elementInfo = typeMap[type];
+        if (!elementInfo) {
+          elementInfo = { tagName: "span" }
+        }
+        if (!tag) {
+          tag = document.createElement(elementInfo.tagName);
+        }
+        if (elementInfo.class) {
+          tag.classList.add(elementInfo.class);
+        }
+        if (elementInfo.tagName !== "br") {
+          tag.innerHTML = execResult[0];
         }
       }
-
-      return r;
+      return tag;
     }
 
-    get lastIndex() {
-      return this.regexp.lastIndex;
-    }
-
-    set lastIndex(value) {
-      this.regexp.lastIndex = lastIndex;
-    }
-
-    get source() {
-      return this.regexp.source;
-    }
-  }
-
-
-  function scan(str) {
-    const regExp = new XRegExp({
-      InputElement: /<WhiteSpace>|<LineTerminator>|<Comments>|<Token>/,
-      WhiteSpace: / /,
-      LineTerminator: /\n|\r/,
-      Comments: /<SingleLineComment>|<MultiLineComment>/,
-      SingleLineComment: /\/\/.*<LineTerminator>/,
-      MultiLineComment: /\/\*(?:[^*]|\*[^\/])*\*\//,
-      Token: /<Literal>|<Keywords>|<Identifier>|<Punctuator>/,
-      Literal: /<NumberLiteral>|<BooleanLiteral>|<StringLiteral>|<NullLiteral>/,
-      Keywords: /if|else|for|function|var|let|const/,
-      Identifier: /[$_a-zA-Z][0-9a-zA-Z$_]*/,
-      Punctuator: /\+|\-|\*|\/|\+\+|\-\-|\+=|\-=|\.|,|;|\:|=|==|===|!|!=|!==|@|&&|&|\|\||\||\)|\(|\}|\{|\]|\[|=>|\?|\>|\</,
-      NumberLiteral: /(?:[1-9][0-9]*|0)(?:\.[0-9]*)?|\.[0-9]+/,
-      BooleanLiteral: /true|false/,
-      StringLiteral: /'(?:[^'\n]|\\[\s\S])*'|"(?:[^'\n]|\\[\s\S])*"|`(?:[^'\n]|\\[\s\S])*`/,
-      NullLiteral: /null/,
-    }, "g", "InputElement");
-    console.log(regExp.source);
-    while (regExp.lastIndex < str.length) {
-      const r = regExp.exec(str)
-      console.log(r);
-      if (!r === null) {
-        break;
+    function render(execResult) {
+      const codeArea = document.querySelector("#codeArea");
+      if (execResult[0]) {
+        const tag = getTag(execResult);
+        codeArea.appendChild(tag);
       }
-      document.write(r[0]);
     }
-  }
 
-  scan(`
+    scan(`
   // test 1
   // test 2
   /*
@@ -93,5 +172,7 @@
     board.appendChild(document.createElement("br"));
   }
    `);
-</script>
-</pre>
+
+
+  </script>
+</body>
