@@ -1,0 +1,1 @@
+`yarn webpack -c 08-component/webpack.config.js`
