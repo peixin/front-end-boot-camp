@@ -12,12 +12,23 @@ class Carousel extends Component {
   }
 
   render() {
-    console.log(this.attributes.src);
+    this.root.classList.add("carousel");
     for (let record of this.attributes.src) {
-      const img = document.createElement("img");
-      img.src = record;
+      const img = document.createElement("div");
+      img.style.backgroundImage = `url('${record}')`;
       this.root.appendChild(img);
     }
+
+    let current = 0;
+    setInterval(() => {
+      const children = this.root.children;
+      current++;
+      current %= children.length;
+      for (let child of children) {
+        child.style.transform = `translateX(${-100 * current}%)`;
+      }
+    }, 1000);
+
     return this.root;
   }
 
@@ -33,13 +44,6 @@ const images = [
   "https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg",
 ];
 
-const rootElement = (
-  <Carousel id="carousel" src={images}>
-    <span>a</span>
-    <span>b</span>
-    <span>c</span>
-    <span>d</span>
-  </Carousel>
-);
+const rootElement = <Carousel id="carousel" src={images}></Carousel>;
 
 rootElement.mountTo(document.body);
