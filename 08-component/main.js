@@ -13,20 +13,34 @@ class Carousel extends Component {
 
   render() {
     this.root.classList.add("carousel");
-    for (let record of this.attributes.src) {
+    for (let index in this.attributes.src) {
+      const record = this.attributes.src[index];
       const img = document.createElement("div");
+
+      img.innerText = index;
       img.style.backgroundImage = `url('${record}')`;
       this.root.appendChild(img);
     }
 
-    let current = 0;
+    const children = this.root.children;
+    let currentIndex = 0;
+
     setInterval(() => {
-      const children = this.root.children;
-      current++;
-      current %= children.length;
-      for (let child of children) {
-        child.style.transform = `translateX(${-100 * current}%)`;
-      }
+      const nextIndex = (currentIndex + 1) % children.length;
+
+      const current = children[currentIndex];
+      const next = children[nextIndex];
+
+      next.style.transition = "none";
+      next.style.transform = `translateX(${100 - 100 * nextIndex}%)`;
+
+      setTimeout(() => {
+        next.style.transition = "";
+        current.style.transform = `translateX(${-100 * (currentIndex + 1)}%)`;
+        next.style.transform = `translateX(${-100 * nextIndex}%)`;
+
+        currentIndex = nextIndex;
+      }, 16);
     }, 1000);
 
     return this.root;
