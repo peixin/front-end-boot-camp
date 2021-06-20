@@ -23,25 +23,57 @@ class Carousel extends Component {
     }
 
     const children = this.root.children;
-    let currentIndex = 0;
 
-    setInterval(() => {
-      const nextIndex = (currentIndex + 1) % children.length;
+    let startX;
+    let position = 0;
 
-      const current = children[currentIndex];
-      const next = children[nextIndex];
+    const onDown = (event) => {
+      startX = event.clientX;
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+    };
 
-      next.style.transition = "none";
-      next.style.transform = `translateX(${100 - 100 * nextIndex}%)`;
+    const onMove = (event) => {
+      const x = event.clientX - startX;
+      for (let child of children) {
+        child.style.transition = "none";
+        child.style.transform = `translateX(${x - position * 500}px)`;
+      }
+    };
 
-      setTimeout(() => {
-        next.style.transition = "";
-        current.style.transform = `translateX(${-100 * (currentIndex + 1)}%)`;
-        next.style.transform = `translateX(${-100 * nextIndex}%)`;
+    const onUp = (event) => {
+      const x = event.clientX - startX;
+      position = position - Math.round(x / 500);
 
-        currentIndex = nextIndex;
-      }, 16);
-    }, 1000);
+      for (let child of children) {
+        child.style.transition = "";
+        child.style.transform = `translateX(${-position * 500}px)`;
+      }
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+
+    this.root.addEventListener("mousedown", onDown);
+
+    // let currentIndex = 0;
+
+    // setInterval(() => {
+    //   const nextIndex = (currentIndex + 1) % children.length;
+
+    //   const current = children[currentIndex];
+    //   const next = children[nextIndex];
+
+    //   next.style.transition = "none";
+    //   next.style.transform = `translateX(${100 - 100 * nextIndex}%)`;
+
+    //   setTimeout(() => {
+    //     next.style.transition = "";
+    //     current.style.transform = `translateX(${-100 * (currentIndex + 1)}%)`;
+    //     next.style.transform = `translateX(${-100 * nextIndex}%)`;
+
+    //     currentIndex = nextIndex;
+    //   }, 16);
+    // }, 1000);
 
     return this.root;
   }
